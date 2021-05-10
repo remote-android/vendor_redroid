@@ -71,11 +71,11 @@ static int get_conf(struct ipconfig *conf) {
     return 0;
 }
 
-static int write_conf(struct ipconfig *conf) {
+static int write_conf(struct ipconfig *conf, uint32_t v) {
     FILE *fp = fopen("/data/misc/ethernet/ipconfig.txt", "w+");
     char prop[PROP_VALUE_MAX];
 
-    writePackedUInt32(3, fp); // version
+    writePackedUInt32(v, fp); // version
 
     writePackedString("ipAssignment", fp);
     writePackedString("STATIC", fp);
@@ -94,7 +94,8 @@ static int write_conf(struct ipconfig *conf) {
     writePackedString(prop, fp); // TODO multiple dns
 
     writePackedString("id", fp);
-    writePackedString("eth0", fp);
+    if (v == 2) writePackedUInt32(0, fp);
+    else writePackedString("eth0", fp);
 
     writePackedString("eos", fp);
 
@@ -102,11 +103,16 @@ static int write_conf(struct ipconfig *conf) {
     return 0;
 }
 
-int main() {
+int main(int argc, char **argv) {
+    uint32_t v = 3;
+    if (argc > 1 && !strcmp(argv[1], "v2")) {
+        printf("ipconfig: using version 2");
+        v = 2;
+    }
     struct ipconfig conf;
     get_conf(&conf);
     printf("ipconfig: ipv4: %s, mask: %i, gateway: %s", conf.ipv4, conf.mask, conf.gateway);
-    write_conf(&conf);
+    write_conf(&conf, v);
     return 0;
 }
 
