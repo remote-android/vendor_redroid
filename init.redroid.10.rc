@@ -1,0 +1,36 @@
+on early-init
+    mount none /system/etc /etc bind rec  # docker fix
+    mount sysfs sysfs /sys rw remount  # ueventd fix
+
+    write /data/.empty 0
+    mount none /data/.empty /proc/vmallocinfo bind # lxcfs?
+
+    # Mount binderfs
+    mkdir /dev/binderfs
+    mount binder binder /dev/binderfs stats=global
+    chmod 0755 /dev/binderfs
+
+    symlink /dev/binderfs/binder /dev/binder
+    symlink /dev/binderfs/hwbinder /dev/hwbinder
+    symlink /dev/binderfs/vndbinder /dev/vndbinder
+
+    chmod 0666 /dev/binderfs/hwbinder
+    chmod 0666 /dev/binderfs/binder
+    chmod 0666 /dev/binderfs/vndbinder
+
+on fs
+    # no need to mount, and encryption not supported yet
+    trigger nonencrypted
+
+on boot
+    # ION currently not supported
+    setprop debug.stagefright.ccodec 0
+
+on property:sys.boot_completed=1
+    start boot_completed-setup
+
+service boot_completed-setup /vendor/bin/boot_completed.redroid.sh
+    user root
+    group root
+    oneshot
+
