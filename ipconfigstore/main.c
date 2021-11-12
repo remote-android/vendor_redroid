@@ -82,7 +82,9 @@ static int write_conf(struct ipconfig *conf, uint32_t v) {
     writePackedUInt32(conf->mask, fp);
 
     writePackedString("gateway", fp);
-    writePackedUInt32(0, fp); // Default route.
+    writePackedUInt32(1, fp); // Default route (dest).
+    writePackedString("0.0.0.0", fp);
+    writePackedUInt32(0, fp);
     writePackedUInt32(1, fp); // Have a gateway.
     writePackedString(conf->gateway, fp);
 
