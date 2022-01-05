@@ -1,0 +1,8 @@
+cc_binary {
+    name: "binder_alloc",
+    srcs: ["*.c"],
+    cflags: ["-Wall", "-Werror"],
+    vendor: true,
+    include_dirs: ["bionic/libc/kernel"],
+}
+
