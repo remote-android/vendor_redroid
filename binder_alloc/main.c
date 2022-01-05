@@ -9,8 +9,14 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <uapi/linux/android/binder.h>
-#include <uapi/linux/android/binderfs.h>
+
+#define BINDERFS_MAX_NAME 255
+struct binderfs_device {
+    char name[BINDERFS_MAX_NAME + 1];
+    __u32 major;
+    __u32 minor;
+};
+#define BINDER_CTL_ADD _IOWR('b', 1, struct binderfs_device)
 
 void usage(char *bin) {
     printf("USAGE: %s BINDER-CONTROL-PATH DEVICE1 [DEVICE2 ...]\n", bin);
