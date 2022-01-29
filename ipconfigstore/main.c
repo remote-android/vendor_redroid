@@ -1,4 +1,4 @@
- #include <sys/types.h>
+#include <sys/types.h>
 #include <ifaddrs.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -15,13 +15,10 @@
 
 #include "data.h"
 
-// TODO add proxy support
-
 struct ipconfig {
     uint32_t mask;
     char ipv4[16];
     char gateway[16];
-    char dns[16];
 };
 
 static int get_gateway(char *dev, char *ret) {
@@ -92,6 +89,39 @@ static int write_conf(struct ipconfig *conf, uint32_t v) {
     writePackedString("dns", fp);
     property_get("ro.kernel.net.eth0.dns1", prop, "8.8.8.8");
     writePackedString(prop, fp); // TODO multiple dns
+
+    // static | pac | none | unassigned
+    property_get("ro.kernel.net.eth0.proxy.type", prop, NULL);
+    if (!strcmp(prop, "static")) {
+        writePackedString("proxySettings", fp);
+        writePackedString("STATIC", fp);
+
+        writePackedString("proxyHost", fp);
+        property_get("ro.kernel.net.eth0.proxy.host", prop, "");
+        writePackedString(prop, fp);
+
+        writePackedString("proxyPort", fp);
+        int32_t port = property_get_int32("ro.kernel.net.eth0.proxy.port", 3128);
+        writePackedUInt32(port, fp);
+
+        property_get("ro.kernel.net.eth0.proxy.exclusionList", prop, NULL);
+        if (strlen(prop)) {
+            writePackedString("exclusionList", fp);
+            writePackedString(prop, fp);
+        }
+    } else if (!strcmp(prop, "pac")) {
+        writePackedString("proxySettings", fp);
+        writePackedString("PAC", fp);
+
+        writePackedString("proxyPac", fp);
+        property_get("ro.kernel.net.eth0.proxy.pac", prop, "");
+        writePackedString(prop, fp);
+    } else if (!strcmp(prop, "none")) {
+        writePackedString("proxySettings", fp);
+        writePackedString("NONE", fp);
+    } else {
+        // ignored
+    }
 
     writePackedString("id", fp);
     if (v == 2) writePackedUInt32(0, fp);
