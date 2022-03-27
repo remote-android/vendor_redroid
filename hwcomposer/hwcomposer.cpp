@@ -53,7 +53,7 @@ static int hwc_prepare(hwc_composer_device_1_t* dev __unused,
         if (contents->hwLayers[i].compositionType == HWC_FRAMEBUFFER_TARGET) {
             continue;
         }
-        contents->hwLayers[i].compositionType = HWC_FRAMEBUFFER;
+        contents->hwLayers[i].compositionType = HWC_OVERLAY;
     }
     return 0;
 }
