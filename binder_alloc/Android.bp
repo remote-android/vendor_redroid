@@ -1,6 +1,6 @@
 cc_binary {
     name: "binder_alloc",
-    srcs: ["*.c"],
+    srcs: ["main.cpp"],
     cflags: ["-Wall", "-Werror"],
     vendor: true,
 }

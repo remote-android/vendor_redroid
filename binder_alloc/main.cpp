@@ -1,4 +1,3 @@
-#define _GNU_SOURCE
 #include <errno.h>
 #include <fcntl.h>
 #include <libgen.h>
@@ -27,7 +26,7 @@ int main(int argc, char *argv[])
 {
     int fd, ret;
     size_t len;
-    struct binderfs_device device = { 0 };
+    struct binderfs_device device{};
 
     if (argc < 3) {
         usage(basename(argv[0]));
