@@ -1,0 +1,24 @@
+cc_library_shared {
+    name: "hwcomposer.redroid",
+    vendor: true,
+
+    srcs: [
+        "hwcomposer.cpp",
+    ],
+
+    shared_libs: [
+        "liblog",
+        "libcutils",
+        "libhardware",
+        "libsync",
+    ],
+
+    cflags: [
+        "-Wall", "-Werror",
+        "-DLOG_TAG=\"hwcomposer\"",
+    ],
+
+    relative_install_path: "hw",
+
+    compile_multilib: "first",
+}
