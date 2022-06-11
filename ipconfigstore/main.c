@@ -136,11 +136,13 @@ static int write_conf(struct ipconfig *conf, uint32_t v) {
 }
 
 int main(int argc, char **argv) {
+    (void)argc;
+    (void)argv;
+
     uint32_t v = 3;
-    if (argc > 1 && !strcmp(argv[1], "v2")) {
-        printf("ipconfig: using version 2");
-        v = 2;
-    }
+    // use V2 for Android 8.1
+    if (property_get_int32("ro.build.version.sdk", 0) <= 27) v = 2;
+
     struct ipconfig conf;
     get_conf(&conf);
     printf("ipconfig: ipv4: %s, mask: %i, gateway: %s", conf.ipv4, conf.mask, conf.gateway);
