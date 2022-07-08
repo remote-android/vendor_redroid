@@ -56,8 +56,7 @@ on init
     mount none /data/.empty /proc/vmallocinfo bind
 
     # fix suspend host system?
-    mount none /dev/null /sys/power/state bind
-    chmod 0666 /dev/null
+    mount none /data/.empty /sys/power/state bind
 
     setprop debug.renderengine.backend gles
 
