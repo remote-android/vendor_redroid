@@ -70,3 +70,5 @@ on post-fs-data
 
     # no need to mount, and encryption not supported yet
     trigger nonencrypted
+
+    exec -- /vendor/bin/post-fs-data.redroid.sh
