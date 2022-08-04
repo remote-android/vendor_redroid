@@ -21,8 +21,6 @@ on early-init
     # inputflinger require this dir
     mkdir /dev/input
 
-    exec -- /vendor/bin/gpu_config.sh
-
     # disable codec2 by default, DMA Heap required
     setprop debug.stagefright.ccodec 0
 
@@ -76,3 +74,9 @@ on post-fs-data
     trigger nonencrypted
 
     exec -- /vendor/bin/post-fs-data.redroid.sh
+
+
+on early-boot
+
+    # before HAL / SurfaceFlinger
+    exec -- /vendor/bin/gpu_config.sh
