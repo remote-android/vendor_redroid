@@ -16,7 +16,7 @@ setup_vulkan() {
         v3d|vc4)
             setprop ro.hardware.vulkan broadcom
             ;;
-        msm)
+        msm_drm)
             setprop ro.hardware.vulkan freedreno
             ;;
         panfrost)
@@ -29,7 +29,7 @@ setup_vulkan() {
 }
 
 setup_render_node() {
-    node=`getprop ro.kernel.redroid.gpu.node`
+    node=`getprop ro.boot.redroid_gpu_node`
     if [ ! -z "$node" ]; then
         echo "force render node: $node"
 
@@ -50,7 +50,7 @@ setup_render_node() {
             echo "DRI node exists, driver: $driver"
             setup_vulkan $driver
             case $driver in
-                i915|amdgpu|nouveau|virtio_gpu|v3d|vc4|msm|panfrost)
+                i915|amdgpu|nouveau|virtio_gpu|v3d|vc4|msm_drm|panfrost)
                     node="/dev/dri/renderD$d"
                     echo "use render node: $node"
                     setprop gralloc.gbm.device $node
@@ -70,7 +70,7 @@ gpu_setup_host() {
 
     setprop ro.hardware.egl mesa
     setprop ro.hardware.gralloc gbm
-    setprop ro.kernel.redroid.fps 30
+    setprop ro.boot.redroid_fps 30
 }
 
 gpu_setup_guest() {
@@ -93,10 +93,10 @@ gpu_setup_guest() {
 }
 
 gpu_setup() {
-    ## redroid.gpu.mode=(auto, host, guest)
-    ## redroid.gpu.node= (/dev/dri/renderDxxx)
+    ## mode=(auto, host, guest)
+    ## node=(/dev/dri/renderDxxx)
 
-    mode=`getprop ro.kernel.redroid.gpu.mode auto`
+    mode=`getprop ro.boot.redroid_gpu_mode auto`
     if [ "$mode" = "host" ]; then
         setup_render_node
         gpu_setup_host

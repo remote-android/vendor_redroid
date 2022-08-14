@@ -189,9 +189,9 @@ static int32_t hwc_attribute(struct redroid_hwc_composer_device_1* pdev,
         case HWC_DISPLAY_VSYNC_PERIOD:
             return pdev->vsync_period_ns;
         case HWC_DISPLAY_WIDTH:
-            return property_get_int32("ro.boot.redroid_width", property_get_int32("ro.kernel.redroid.width", 720));
+            return property_get_int32("ro.boot.redroid_width", 720);
         case HWC_DISPLAY_HEIGHT:
-            return property_get_int32("ro.boot.redroid_height", property_get_int32("ro.kernel.redroid.height", 1280));
+            return property_get_int32("ro.boot.redroid_height", 1280);
         case HWC_DISPLAY_DPI_X:
         case HWC_DISPLAY_DPI_Y:
             return property_get_int32("ro.sf.lcd_density", 320) / 2;
@@ -307,7 +307,7 @@ static int hwc_open(const struct hw_module_t* module, const char* name,
         .getDisplayAttributes = hwc_get_display_attributes,
     };
 
-    int fps = property_get_int32("ro.boot.redroid_fps", property_get_int32("ro.kernel.redroid.fps", 15));
+    int fps = property_get_int32("ro.boot.redroid_fps", 15);
     if (fps <= 0 || fps > 120) fps = 15;
     ALOGD("Set vsync period = %d", fps);
     pdev->vsync_period_ns = 1000 * 1000 * 1000 / fps;
