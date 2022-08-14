@@ -38,8 +38,9 @@ uint32_t convertBigEndianUInt32(uint32_t value)
 	return aux.value;
 }
 
-bool writePackedString(char *string, FILE *stream)
+bool writePackedString(const std::string& str, FILE *stream)
 {
+    const char *string = str.c_str();
 	size_t stringLength = strlen(string);
 
 	if (!writePackedUInt16(stringLength, stream))

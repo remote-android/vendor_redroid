@@ -11,9 +11,13 @@
 #include <stdio.h>
 #include <arpa/inet.h>
 
-#include <cutils/properties.h>
+#include <set>
+
+#include <android-base/properties.h>
 
 #include "data.h"
+
+using namespace android::base;
 
 struct ipconfig {
     uint32_t mask;
@@ -64,13 +68,55 @@ static int get_conf(struct ipconfig *conf) {
         ifAddrStruct=ifAddrStruct->ifa_next;
     }
     freeifaddrs(ifAddrStruct);
-    get_gateway("eth0", conf->gateway);
+    get_gateway((char *) "eth0", conf->gateway);
     return 0;
+}
+
+static void write_dns(FILE *fp) {
+    std::set<std::string> dnsList;
+    auto ndns = GetIntProperty("ro.boot.redroid_net_ndns", 0);
+    for (int i = 1; i <= ndns; ++i) {
+        dnsList.insert(GetProperty("ro.boot.redroid_net_dns" + std::to_string(i), ""));
+    }
+    if (dnsList.empty()) dnsList.insert("8.8.8.8");
+
+    for (auto& dns: dnsList) {
+        writePackedString("dns", fp);
+        writePackedString(dns.c_str(), fp);
+    }
+}
+
+static void write_proxy(FILE *fp) {
+    // static | pac | none | unassigned
+    std::string proxy_type = GetProperty("ro.boot.redroid_net_proxy_type", "");
+    if ("static" == proxy_type) {
+        writePackedString("proxySettings", fp);
+        writePackedString("STATIC", fp);
+
+        writePackedString("proxyHost", fp);
+        writePackedString(GetProperty("ro.boot.redroid_net_proxy_host", "").c_str(), fp);
+
+        writePackedString("proxyPort", fp);
+        writePackedUInt32(GetIntProperty("ro.boot.redroid_net_proxy_port", 3128), fp);
+
+        writePackedString("exclusionList", fp);
+        writePackedString(GetProperty("ro.boot.redroid_net_proxy_exclude_list", "").c_str(), fp);
+    } else if ("pac" == proxy_type) {
+        writePackedString("proxySettings", fp);
+        writePackedString("PAC", fp);
+
+        writePackedString("proxyPac", fp);
+        writePackedString(GetProperty("ro.boot.redroid_net_proxy_pac", "").c_str(), fp);
+    } else if ("none" == proxy_type) {
+        writePackedString("proxySettings", fp);
+        writePackedString("NONE", fp);
+    } else {
+        // ignored
+    }
 }
 
 static int write_conf(struct ipconfig *conf, uint32_t v) {
     FILE *fp = fopen("/data/misc/ethernet/ipconfig.txt", "w+");
-    char prop[PROP_VALUE_MAX];
 
     writePackedUInt32(v, fp); // version
 
@@ -88,42 +134,9 @@ static int write_conf(struct ipconfig *conf, uint32_t v) {
     writePackedUInt32(1, fp); // Have a gateway.
     writePackedString(conf->gateway, fp);
 
-    writePackedString("dns", fp);
-    property_get("ro.kernel.net.eth0.dns1", prop, "8.8.8.8");
-    writePackedString(prop, fp); // TODO multiple dns
+    write_dns(fp);
 
-    // static | pac | none | unassigned
-    property_get("ro.kernel.net.eth0.proxy.type", prop, NULL);
-    if (!strcmp(prop, "static")) {
-        writePackedString("proxySettings", fp);
-        writePackedString("STATIC", fp);
-
-        writePackedString("proxyHost", fp);
-        property_get("ro.kernel.net.eth0.proxy.host", prop, "");
-        writePackedString(prop, fp);
-
-        writePackedString("proxyPort", fp);
-        int32_t port = property_get_int32("ro.kernel.net.eth0.proxy.port", 3128);
-        writePackedUInt32(port, fp);
-
-        property_get("ro.kernel.net.eth0.proxy.exclusionList", prop, NULL);
-        if (strlen(prop)) {
-            writePackedString("exclusionList", fp);
-            writePackedString(prop, fp);
-        }
-    } else if (!strcmp(prop, "pac")) {
-        writePackedString("proxySettings", fp);
-        writePackedString("PAC", fp);
-
-        writePackedString("proxyPac", fp);
-        property_get("ro.kernel.net.eth0.proxy.pac", prop, "");
-        writePackedString(prop, fp);
-    } else if (!strcmp(prop, "none")) {
-        writePackedString("proxySettings", fp);
-        writePackedString("NONE", fp);
-    } else {
-        // ignored
-    }
+    write_proxy(fp);
 
     writePackedString("id", fp);
     if (v == 2) writePackedUInt32(0, fp);
@@ -141,7 +154,7 @@ int main(int argc, char **argv) {
 
     uint32_t v = 3;
     // use V2 for Android 8.1
-    if (property_get_int32("ro.build.version.sdk", 0) <= 27) v = 2;
+    if (GetIntProperty("ro.build.version.sdk", 0) <= 27) v = 2;
 
     struct ipconfig conf;
     get_conf(&conf);

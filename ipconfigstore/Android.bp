@@ -1,8 +1,8 @@
 cc_binary {
     name: "ipconfigstore",
-    srcs: ["*.c"],
+    srcs: ["*.cc"],
     cflags: ["-Wall", "-Werror"],
-    shared_libs: ["libcutils"],
+    shared_libs: ["libbase"],
     vendor: true,
 }
 
