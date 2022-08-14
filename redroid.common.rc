@@ -68,6 +68,8 @@ on init
 
 on post-fs-data
     # fix for static IP, must after post-fs-data and before netd
+    # rm apex config (use legacy path)
+    rm /data/misc/apexdata/com.android.tethering/misc/ethernet/ipconfig.txt
     exec - system system -- /vendor/bin/ipconfigstore
 
     # no need to mount, and encryption not supported yet
