@@ -1,0 +1,47 @@
+# convert legacy props
+
+# overlay data
+on early-init && property:ro.kernel.redroid.overlay=1
+    trigger use_redroid_overlayfs
+
+
+# display
+on early-init && property:ro.kernel.redroid.width=*
+    setprop ro.boot.redroid_width ${ro.kernel.redroid.width}
+
+on early-init && property:ro.kernel.redroid.height=*
+    setprop ro.boot.redroid_height ${ro.kernel.redroid.height}
+
+on early-init && property:ro.kernel.redroid.fps=*
+    setprop ro.boot.redroid_fps ${ro.kernel.redroid.fps}
+
+
+# DNS
+on early-init && property:ro.kernel.net.eth0.dns1=*
+    setprop ro.boot.redroid_net_ndns 1
+    setprop ro.boot.redroid_net_dns1 ${ro.kernel.net.eth0.dns1}
+
+
+# network proxy
+on early-init && property:ro.kernel.net.eth0.proxy.type=*
+    setprop ro.boot.redroid_net_proxy_type ${ro.kernel.net.eth0.proxy.type}
+
+on early-init && property:ro.kernel.net.eth0.proxy.host=*
+    setprop ro.boot.redroid_net_proxy_host ${ro.kernel.net.eth0.proxy.host}
+
+on early-init && property:ro.kernel.net.eth0.proxy.port=*
+    setprop ro.boot.redroid_net_proxy_port ${ro.kernel.net.eth0.proxy.port}
+
+on early-init && property:ro.kernel.net.eth0.proxy.exclusionList=*
+    setprop ro.boot.redroid_net_proxy_exclude ${ro.kernel.net.eth0.proxy.exclusionList}
+
+on early-init && property:ro.kernel.net.eth0.proxy.pac=*
+    setprop ro.boot.redroid_net_proxy_pac ${ro.kernel.net.eth0.proxy.pac} 
+
+
+# GPU
+on early-init && property:ro.kernel.redroid.gpu.mode=*
+    setprop ro.boot.redroid_gpu_mode ${ro.kernel.redroid.gpu.mode}
+
+on early-init && property:ro.kernel.redroid.gpu.node=*
+    setprop ro.boot.redroid_gpu_node ${ro.kernel.redroid.gpu.node}

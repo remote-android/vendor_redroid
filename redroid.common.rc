@@ -32,9 +32,6 @@ on early-init
 on early-init && property:ro.boot.use_redroid_overlayfs=1
     trigger use_redroid_overlayfs
 
-# legacy
-on early-init && property:ro.kernel.redroid.overlay=1
-    trigger use_redroid_overlayfs
 
 on use_redroid_overlayfs
     mkdir /data-diff/upper
