@@ -16,6 +16,8 @@ on early-init
     chmod 0444 /dev/dma_heap/system
     chown system system /dev/dma_heap/system
 
+    # used to place domain sockets
+    mkdir /ipc 0777
 
     exec -- /bin/rm -rf /dev/input
     # inputflinger require this dir
