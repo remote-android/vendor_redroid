@@ -1,6 +1,5 @@
 PRODUCT_PACKAGES += \
 	binder_alloc \
-	hwcomposer.redroid \
 	gralloc.redroid \
 	ipconfigstore \
 
