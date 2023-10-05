@@ -29,6 +29,8 @@ on early-init
     # disable some verbose logs
     setprop log.tag.libprocessgroup F
 
+    # assume GLES 3.2 supported
+    setprop ro.opengles.version 196610
 
 # setup overlay data partition
 on early-init && property:ro.boot.use_redroid_overlayfs=1
