@@ -48,6 +48,10 @@ on early-init && property:ro.boot.redroid_dpi=*
     setprop ro.sf.lcd_density ${ro.boot.redroid_dpi}
 
 
+on property:ro.zygote=zygote64_32
+    write /proc/sys/kernel/pid_max 65535
+
+
 # use memfd (ashmem removed in 5.18), memfd is disabled in post-fs-data (init.rc)
 on post-fs-data && property:ro.boot.use_memfd=*
     setprop sys.use_memfd ${ro.boot.use_memfd}
