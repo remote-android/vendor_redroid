@@ -95,7 +95,7 @@ gpu_setup() {
     ## mode=(auto, host, guest)
     ## node=(/dev/dri/renderDxxx)
 
-    mode=$(getprop ro.boot.redroid_gpu_mode auto)
+    mode=$(getprop ro.boot.redroid_gpu_mode guest)
     if [ "$mode" = "host" ]; then
         setup_render_node
         gpu_setup_host
