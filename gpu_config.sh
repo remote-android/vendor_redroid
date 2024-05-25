@@ -29,32 +29,31 @@ setup_vulkan() {
 }
 
 setup_render_node() {
-    node=`getprop ro.boot.redroid_gpu_node`
-    if [ ! -z "$node" ]; then
+    node=$(getprop ro.boot.redroid_gpu_node)
+    if [ -n "$node" ]; then
         echo "force render node: $node"
 
-        setprop gralloc.gbm.device $node
-        chmod 666 $node
+        setprop gralloc.gbm.device "$node"
+        chmod 666 "$node"
 
         # setup vulkan
-        cd /sys/kernel/debug/dri
-        driver="`cat ${node: -3}/name | cut -d' ' -f1`"
-        setup_vulkan $driver
+        driver=$(cut -d' ' -f1 "/sys/kernel/debug/dri/${node#/dev/dri/renderD}/name")
+        setup_vulkan "$driver"
         return 0
     fi
 
-    cd /sys/kernel/debug/dri
+    cd /sys/kernel/debug/dri || exit
     for d in * ; do
         if [ "$d" -ge "128" ]; then
-            driver="`cat $d/name | cut -d' ' -f1`"
+            driver="$(cut -d' ' -f1 "$d/name")"
             echo "DRI node exists, driver: $driver"
-            setup_vulkan $driver
+            setup_vulkan "$driver"
             case $driver in
                 i915|amdgpu|nouveau|virtio_gpu|v3d|vc4|msm_drm|panfrost)
                     node="/dev/dri/renderD$d"
                     echo "use render node: $node"
-                    setprop gralloc.gbm.device $node
-                    chmod 666 $node
+                    setprop gralloc.gbm.device "$node"
+                    chmod 666 "$node"
                     return 0
                     ;;
             esac
@@ -76,8 +75,8 @@ gpu_setup_host() {
 gpu_setup_guest() {
     echo "use GPU guest mode"
 
-    local EGL_DIR=/vendor/lib64/egl
-    local egl=
+    EGL_DIR=/vendor/lib64/egl
+    egl=
 
     if [ -f $EGL_DIR/libEGL_angle.so ]; then
         egl=angle
@@ -96,7 +95,7 @@ gpu_setup() {
     ## mode=(auto, host, guest)
     ## node=(/dev/dri/renderDxxx)
 
-    mode=`getprop ro.boot.redroid_gpu_mode auto`
+    mode=$(getprop ro.boot.redroid_gpu_mode auto)
     if [ "$mode" = "host" ]; then
         setup_render_node
         gpu_setup_host
