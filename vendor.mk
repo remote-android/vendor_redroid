@@ -1,3 +1,6 @@
+# skip androidx.window.extensions check
+PRODUCT_BROKEN_VERIFY_USES_LIBRARIES := true
+
 PRODUCT_PACKAGES += \
 	binder_alloc \
 	gralloc.redroid \
