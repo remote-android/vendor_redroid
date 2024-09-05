@@ -75,12 +75,15 @@ gpu_setup_host() {
 gpu_setup_guest() {
     echo "use GPU guest mode"
 
-    EGL_DIR=/vendor/lib64/egl
+    VENDOR_EGL_DIR=/vendor/lib64/egl
+    SYSTEM_EGL_DIR=/system/lib64
+    EGL_ANGLE=libEGL_angle.so
+    EGL_SS=libEGL_swiftshader.so
     egl=
 
-    if [ -f $EGL_DIR/libEGL_angle.so ]; then
+    if [ -f $VENDOR_EGL_DIR/$EGL_ANGLE ] || [ -f $SYSTEM_EGL_DIR/$EGL_ANGLE ]; then
         egl=angle
-    elif [ -f $EGL_DIR/libEGL_swiftshader.so ];then
+    elif [ -f $VENDOR_EGL_DIR/$EGL_SS ] || [ -f $SYSTEM_EGL_DIR/$EGL_SS ]; then
         egl=swiftshader
     else
         echo "ERROR no SW egl found!!!"
