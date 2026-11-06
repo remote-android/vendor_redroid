@@ -1,0 +1,6 @@
+cc_test {
+    name: "gralloc_redroid_test",
+    srcs: ["gralloc_test.cpp"],
+    shared_libs: ["libnativewindow"],
+    cflags: ["-Wall", "-Werror"],
+}
