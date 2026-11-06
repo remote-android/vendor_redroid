@@ -143,6 +143,18 @@ static int gralloc_alloc(alloc_device_t* dev,
     if (!pHandle || !pStride)
         return -EINVAL;
 
+    if (format == HAL_PIXEL_FORMAT_BLOB) {
+        if (height != 1)
+            return -EINVAL;
+
+        int err = gralloc_alloc_buffer(dev, width, usage, pHandle);
+        if (err < 0)
+            return err;
+
+        *pStride = width;
+        return 0;
+    }
+
     int bytesPerPixel = 0;
     switch (format) {
         case HAL_PIXEL_FORMAT_RGBA_FP16:
