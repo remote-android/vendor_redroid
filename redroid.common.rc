@@ -72,6 +72,16 @@ on init
 
 
 on post-fs-data
+    # lmkd reacts to memory pressure events (PSI) from /proc/pressure/memory,
+    # which is not namespaced: inside a container it is the whole host's
+    # pressure. When the host stalls briefly (page cache reclaim, another
+    # container), lmkd in every instance sees "critical" pressure at once and
+    # kills apps, the foreground one included. The container's own cgroup v2
+    # memory.pressure has the same format and accepts the same triggers; bind it
+    # before lmkd starts (class core, on boot). Without cgroup v2 this mount
+    # fails and nothing changes.
+    mount none /sys/fs/cgroup/memory.pressure /proc/pressure/memory bind
+
     # fix for static IP, must after post-fs-data and before netd
     # rm apex config (use legacy path)
     rm /data/misc/apexdata/com.android.tethering/misc/ethernet/ipconfig.txt
